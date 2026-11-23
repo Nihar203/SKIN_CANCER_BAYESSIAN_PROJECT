@@ -1,1 +1,42 @@
+## Visual Results & Model Evaluation
 
+### 1. Class Distribution & Balancing
+The raw HAM10000 dataset is heavily skewed toward melanocytic nevi (`nv`, 6,705 samples), while rare classes like dermatofibroma (`df`, 115) and vascular lesions (`vasc`, 142) make up a small fraction of the data. Smart oversampling raises all minority classes to **1,500 samples** each while preserving the original `nv` distribution.
+
+![Class Distribution Before Balancing](assets/class_distribution_before.png)
+
+![Class Distribution Before vs. After Balancing](assets/class_distribution_after.png)
+
+---
+
+### 2. Bayesian Hyperparameter Optimization
+Ten Bayesian Optimization trials (`T0`–`T9`) were ranked by validation accuracy. Every trial achieved strong convergence (~84.5%–88.9%), with the top configuration reaching **88.87% (`0.8887`) validation accuracy**.
+
+![Bayesian Optimization Trial Scores](assets/tuning_history.png)
+
+---
+
+### 3. Training & Validation Curves
+Full training ran for **37 epochs** (Epochs `0`–`36`) before early stopping triggered:
+- **Accuracy:** Training accuracy climbed smoothly from `~0.63` to `~0.97`, while validation accuracy stabilized after Epoch 20 and peaked at **~91.6% (`~0.916`)**.
+- **Loss:** Training focal loss decreased steadily from `~0.20` to `~0.006`; validation loss dropped from `~0.21` and leveled off around `~0.055`.
+
+![Accuracy and Loss over Epochs](assets/training_curves.png)
+
+---
+
+### 4. Per-Class ROC-AUC Performance (One-vs-Rest)
+The final model achieves near-perfect class separability across all seven skin lesion categories, with a **macro-average ROC-AUC of `0.993`**.
+
+![ROC-AUC Curves Per Class](assets/roc_auc_curves.png)
+
+| Class | Skin Lesion Category | OvR ROC-AUC |
+| :--- | :--- | :---: |
+| `akiec` | Actinic keratoses | `1.000` |
+| `df` | Dermatofibroma | `1.000` |
+| `vasc` | Vascular lesions | `1.000` |
+| `bcc` | Basal cell carcinoma | `0.999` |
+| `nv` | Melanocytic nevi | `0.990` |
+| `bkl` | Benign keratosis-like lesions | `0.984` |
+| `mel` | Melanoma | `0.977` |
+| **Macro Avg** | **All 7 Classes** | **`0.993`** |
